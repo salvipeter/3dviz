@@ -85,6 +85,8 @@ void MyViewer::drawSegment(const MyViewer::Segment &segment) const
 
 void MyViewer::draw()
 {
+  const Vec x(1, 0, 0), y(0, 1, 0), z(0, 0, 1);
+
   glColor4d(0.0, 1.0, 0.0, 0.5);
   drawPlane(canvas);
 
@@ -92,30 +94,95 @@ void MyViewer::draw()
   drawPlane(table);
 
   glDisable(GL_DEPTH_TEST);
-
   glColor3d(0.0, 1.0, 1.0);
   glBegin(GL_POINTS);
   glVertex3fv(eye);
   glEnd();
-
-  glColor3d(0.0, 0.0, 0.0);
-  drawSegment(segment);
-
-  Segment s;
-  Line l;
-  l.p = eye;
-  l.d = segment.a - eye;
-  s.a = intersectLineWithPlane(l, canvas);
-  l.d = segment.b - eye;
-  s.b = intersectLineWithPlane(l, canvas);
-  drawSegment(s);
-
   glEnable(GL_DEPTH_TEST);
 
-  s.a = eye;
-  s.b = point;
-  glColor3d(1.0, 1.0, 0.0);
-  drawSegment(s);
+  if (animation_type == 1) {
+    const double cube_size = 0.25;
+    Vec a[8], b[8];
+    Line l[8];
+    Segment s[8];
+    a[0] = point - x * cube_size - y * cube_size - z * cube_size;
+    a[1] = point + x * cube_size - y * cube_size - z * cube_size;
+    a[2] = point + x * cube_size + y * cube_size - z * cube_size;
+    a[3] = point - x * cube_size + y * cube_size - z * cube_size;
+    a[4] = point - x * cube_size - y * cube_size + z * cube_size;
+    a[5] = point + x * cube_size - y * cube_size + z * cube_size;
+    a[6] = point + x * cube_size + y * cube_size + z * cube_size;
+    a[7] = point - x * cube_size + y * cube_size + z * cube_size;
+    for (size_t i = 0; i < 8; ++i) {
+      l[i].p = eye;
+      l[i].d = (a[i] - eye).unit();
+      s[i].a = eye;
+      s[i].b = a[i];
+      b[i] = intersectLineWithPlane(l[i], canvas);
+    }
+    glColor3d(1, 1, 0);
+    for (size_t i = 0; i < 8; ++i)
+      drawSegment(s[i]);
+    glColor3d(1.0, 1.0, 1.0);
+    glBegin(GL_POLYGON);
+    glVertex3fv(a[0]); glVertex3fv(a[1]); glVertex3fv(a[2]); glVertex3fv(a[3]); 
+    glEnd();
+    glBegin(GL_POLYGON);
+    glVertex3fv(a[4]); glVertex3fv(a[5]); glVertex3fv(a[6]); glVertex3fv(a[7]); 
+    glEnd();
+    glBegin(GL_POLYGON);
+    glVertex3fv(a[0]); glVertex3fv(a[1]); glVertex3fv(a[5]); glVertex3fv(a[4]); 
+    glEnd();
+    glBegin(GL_POLYGON);
+    glVertex3fv(a[3]); glVertex3fv(a[2]); glVertex3fv(a[6]); glVertex3fv(a[7]); 
+    glEnd();
+    glBegin(GL_POLYGON);
+    glVertex3fv(a[0]); glVertex3fv(a[4]); glVertex3fv(a[7]); glVertex3fv(a[3]); 
+    glEnd();
+    glBegin(GL_POLYGON);
+    glVertex3fv(a[1]); glVertex3fv(a[5]); glVertex3fv(a[6]); glVertex3fv(a[2]); 
+    glEnd();
+    glColor3d(0, 0, 0);
+    glBegin(GL_LINE_LOOP);
+    glVertex3fv(a[0]); glVertex3fv(a[1]); glVertex3fv(a[2]); glVertex3fv(a[3]); 
+    glEnd();
+    glBegin(GL_LINE_LOOP);
+    glVertex3fv(a[4]); glVertex3fv(a[5]); glVertex3fv(a[6]); glVertex3fv(a[7]); 
+    glEnd();
+    glBegin(GL_LINES);
+    glVertex3fv(a[0]); glVertex3fv(a[4]); glVertex3fv(a[1]); glVertex3fv(a[5]); 
+    glVertex3fv(a[2]); glVertex3fv(a[6]); glVertex3fv(a[3]); glVertex3fv(a[7]); 
+    glEnd();
+    glBegin(GL_LINE_LOOP);
+    glVertex3fv(b[0]); glVertex3fv(b[1]); glVertex3fv(b[2]); glVertex3fv(b[3]); 
+    glEnd();
+    glBegin(GL_LINE_LOOP);
+    glVertex3fv(b[4]); glVertex3fv(b[5]); glVertex3fv(b[6]); glVertex3fv(b[7]); 
+    glEnd();
+    glBegin(GL_LINES);
+    glVertex3fv(b[0]); glVertex3fv(b[4]); glVertex3fv(b[1]); glVertex3fv(b[5]); 
+    glVertex3fv(b[2]); glVertex3fv(b[6]); glVertex3fv(b[3]); glVertex3fv(b[7]); 
+    glEnd();
+  } else {
+    glDisable(GL_DEPTH_TEST);
+    glColor3d(0.0, 0.0, 0.0);
+    drawSegment(segment);
+    
+    Segment s;
+    Line l;
+    l.p = eye;
+    l.d = segment.a - eye;
+    s.a = intersectLineWithPlane(l, canvas);
+    l.d = segment.b - eye;
+    s.b = intersectLineWithPlane(l, canvas);
+    drawSegment(s);
+    glEnable(GL_DEPTH_TEST);
+    
+    s.a = eye;
+    s.b = point;
+    glColor3d(1.0, 1.0, 0.0);
+    drawSegment(s);
+  }
 }
 
 Vec MyViewer::intersectLineWithPlane(const MyViewer::Line &line, const MyViewer::Plane &plane)
@@ -137,12 +204,26 @@ void MyViewer::animation1()
     return;
   }
 
+  const double x = (double)animation_counter / 100.0 * 2.0 * M_PI;
+  point = Vec(cos(x) * 0.5, 0.2 + sin(x) / 5, sin(x) * 0.5);
+
+  updateGL();
+}
+
+void MyViewer::animation2()
+{
+  if (++animation_counter == 100) {
+    timer->stop();
+    timer->disconnect();
+    return;
+  }
+
   const double x = (double)animation_counter / 100.0;
   point = segment.a + x * (segment.b - segment.a);
   updateGL();
 }
 
-void MyViewer::animation2()
+void MyViewer::animation3()
 {
   if (++animation_counter == 300) {
     timer->stop();
@@ -156,13 +237,41 @@ void MyViewer::animation2()
   updateGL();
 }
 
+void MyViewer::animation4()
+{
+}
+
+void MyViewer::animation5()
+{
+}
+
+void MyViewer::animation6()
+{
+}
+
 void MyViewer::animate(int type)
 {
   if (timer->isActive())           // Already running an animation
     return;
 
+  animation_type = type;
+
   switch(type) {
   case 1:
+    eye = Vec(-0.3, -2.0, 0.7);
+
+    camera()->setPosition(Vec(3.28356, 0.708553, 0.581566));
+    camera()->setUpVector(Vec(-0.188367, -0.0818547, 0.978682));
+    camera()->setViewDirection(Vec(-0.947526, -0.246932, -0.203023));
+
+    animation_counter = 0;
+    connect(timer, SIGNAL(timeout()), this, SLOT(animation1()));
+    timer->start(50);
+
+    break;
+  case 2:
+    eye = Vec(0, -1.4, 0.7);
+
     camera()->setPosition(Vec(3.38021, -1.95618, 0.171107));
     camera()->setUpVector(Vec(-0.0171574, 0.0576644, 0.998189));
     camera()->setViewDirection(Vec(-0.864684, 0.500405, -0.0437706));
@@ -171,22 +280,25 @@ void MyViewer::animate(int type)
     segment.b = Vec(0.7, -0.6, -0.8);
 
     animation_counter = 0;
-    connect(timer, SIGNAL(timeout()), this, SLOT(animation1()));
-    timer->start(50);
-    break;
-  case 2:
-    point = eye;                // hides the ray
-    animation_counter = 0;
     connect(timer, SIGNAL(timeout()), this, SLOT(animation2()));
     timer->start(50);
     break;
-  case 4:
-    std::cout << "Position: " << camera()->position()[0] << ", " << camera()->position()[1]
-              << ", " << camera()->position()[2] << std::endl;
-    std::cout << "upVector: " << camera()->upVector()[0] << ", " << camera()->upVector()[1]
-              << ", " << camera()->upVector()[2] << std::endl;
-    std::cout << "viewDir: " << camera()->viewDirection()[0] << ", "
-              << camera()->viewDirection()[1] << ", " << camera()->viewDirection()[2] << std::endl;
+  case 3:
+    point = eye;                // hides the ray
+    animation_counter = 0;
+    connect(timer, SIGNAL(timeout()), this, SLOT(animation3()));
+    timer->start(50);
+    break;
+  case 7:
+    std::cout << "camera()->setPosition(Vec(" << camera()->position()[0] << ", "
+              << camera()->position()[1] << ", " << camera()->position()[2]
+              << "));" << std::endl;
+    std::cout << "camera()->setUpVector(Vec(" << camera()->upVector()[0] << ", "
+              << camera()->upVector()[1] << ", " << camera()->upVector()[2]
+              << "));" << std::endl;
+    std::cout << "camera()->setViewDirection(Vec(" << camera()->viewDirection()[0] << ", "
+              << camera()->viewDirection()[1] << ", " << camera()->viewDirection()[2]
+              << "));" << std::endl;
     break;
   default:
     std::cerr << "Animation " << type << " is not implemented yet." << std::endl;

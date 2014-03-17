@@ -7,15 +7,17 @@
 
 MyWindow::MyWindow() : QWidget()
 {
-  setWindowTitle(tr("3D Visualization"));
+  setWindowTitle(tr("3D Vizualizáció"));
 
   viewer = new MyViewer(this);
   QVBoxLayout *vbox = new QVBoxLayout;
   QHBoxLayout *hbox = new QHBoxLayout;
 
-  QString texts[] = { "", tr("Line tracing"), tr("Horizon"), tr("Undefined"), tr("Camera Data") };
+  QString texts[] = { "", tr("Kocka"), tr("Pontok képe"), tr("Sugár"),
+                      tr("Sugársíkok"), tr("Párhuzamosok"), tr("Párhuzamosok síkjai"),
+                      tr("Kamera info") };
   QSignalMapper *mapper = new QSignalMapper(this);
-  for (size_t i = 1; i <= 4; ++i) {
+  for (size_t i = 1; i <= 7; ++i) {
     QPushButton *button = new QPushButton(texts[i]);
     connect(button, SIGNAL(clicked()), mapper, SLOT(map()));
     mapper->setMapping(button, i);
