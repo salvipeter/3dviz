@@ -63,12 +63,8 @@ void MyViewer::drawPlane(const MyViewer::Plane &plane) const
   glEnd();
 }
 
-void MyViewer::drawLine(const MyViewer::Line &line) const
+void MyViewer::drawGeneralPlane(const MyViewer::Plane &) const
 {
-  Segment s;
-  s.a = line.p - line.d * 100.0;
-  s.b = line.p + line.d * 100.0;
-  drawSegment(s);
 }
 
 void MyViewer::drawSegment(const MyViewer::Segment &segment) const
@@ -140,7 +136,7 @@ void MyViewer::draw()
     // The first animation involves a cube and thus needs special handling
     const double cube_size = 0.25;
     Vec a[8], b[8];
-    const Vec &point = points.front();
+    const Vec &point = points[0];
     Line l[8];
     Segment s[8];
     a[0] = point - x * cube_size - y * cube_size - z * cube_size;
@@ -172,7 +168,7 @@ void MyViewer::draw()
   // Draw all segments
   for (size_t i = 0; i < segments.size(); ++i) {
     Segment segment = segments[i];
-    glDisable(GL_DEPTH_TEST);
+    // glDisable(GL_DEPTH_TEST);
     glColor3d(0.0, 0.0, 0.0);
     drawSegment(segment);
     
@@ -182,7 +178,7 @@ void MyViewer::draw()
     l.d = segment.b - eye;
     s.b = intersectLineWithPlane(l, canvas);
     drawSegment(s);
-    glEnable(GL_DEPTH_TEST);
+    // glEnable(GL_DEPTH_TEST);
   }
 
   // Draw all rays
@@ -227,8 +223,8 @@ void MyViewer::animation1()
     return;
   }
 
-  const double x = (double)animation_counter / 100.0 * 2.0 * M_PI;
-  points.front() = Vec(cos(x) * 0.5, 0.2 + sin(x) / 5, sin(x) * 0.5);
+  const double x = (double)animation_counter / 99.0 * 2.0 * M_PI;
+  points[0] = Vec(cos(x) * 0.5, 0.2 + sin(x) / 5, sin(x) * 0.5);
 
   updateGL();
 }
@@ -243,7 +239,7 @@ void MyViewer::animation2()
 
   switch(animation_counter) {
   case 1:
-    segments.front().a = Vec(0.1, 0.3, -0.8);
+    segments[0].a = Vec(0.1, 0.3, -0.8);
     break;
   case 100:
     show_infinite = INF_HORIZON;
@@ -256,7 +252,7 @@ void MyViewer::animation2()
   case 266:
     show_infinite = INF_NONE;
     segments.resize(1);
-    segments.front().a = Vec(0.1, 0.0, -0.8);
+    segments[0].a = Vec(0.1, 0.0, -0.8);
     break;
   case 366:
     show_infinite = INF_FOOT;
@@ -273,25 +269,25 @@ void MyViewer::animation2()
   }
 
   if (animation_counter < 100) {
-    const double x = (double)animation_counter / 100.0;
+    const double x = (double)animation_counter / 99.0;
     // Move point along y
-    points.front() = Vec(0.1, 0.3 + x * x * 100.0, -0.8);
-    segments.front().b = points.front();
+    points[0] = Vec(0.1, 0.3 + x * x * 100.0, -0.8);
+    segments[0].b = points[0];
   } else if (133 <= animation_counter && animation_counter < 233) {
-    const double x = (double)(animation_counter - 133) / 100.0;
+    const double x = (double)(animation_counter - 133) / 99.0;
     // Rays on the horizon
     Vec v(canvas.p[0] - plane_size + 2.0 * x * plane_size, canvas.p[1], eye[2]);
-    points.front() = eye + (v - eye) * 10.0;
+    points[0] = eye + (v - eye) * 10.0;
   } else if (266 <= animation_counter && animation_counter < 366) {
-    const double x = (double)(animation_counter - 266) / 100.0;
+    const double x = (double)(animation_counter - 266) / 99.0;
     // Move point along -y
-    points.front() = Vec(0.1, x * (eye[1] - epsilon), -0.8);
-    segments.front().b = points.front();
+    points[0] = Vec(0.1, x * (eye[1] - epsilon), -0.8);
+    segments[0].b = points[0];
   } else if (399 <= animation_counter && animation_counter < 499) {
-    const double x = (double)(animation_counter - 399) / 100.0;
+    const double x = (double)(animation_counter - 399) / 99.0;
     // Rays on the footline
     Vec v(table.p[0] - plane_size + 2.0 * x * plane_size, eye[1], table.p[2]);
-    points.front() = eye + (v - eye) * 10.0;
+    points[0] = eye + (v - eye) * 10.0;
   } else if (animation_counter == 499) {
     // Show all kinds of points
     points.push_back(Vec(0.1, 0.9, -0.8));
@@ -312,15 +308,37 @@ void MyViewer::animation2()
 
 void MyViewer::animation3()
 {
-  if (++animation_counter == 100) {
+  if (++animation_counter == 300) {
+    points.clear();
+    updateGL();
     timer->stop();
     timer->disconnect();
     return;
   }
 
-  const double x = (double)animation_counter / 100.0;
-  const Segment &segment = segments.front();
-  points.front() = segment.a + x * (segment.b - segment.a);
+  if (animation_counter == 1)
+    segments[0].a = Vec(0.1, -10.0, -0.8);
+  else if (animation_counter == 150) {
+    points.resize(2);
+    segments.push_back(Segment(Vec(0.1, eye[1] + 10.0 * epsilon, -0.8), Vec(0.1, 10.0, -0.8)));
+  }
+
+  if (animation_counter < 100) {
+    const double x = (double)animation_counter / 99.0;
+    Segment &segment = segments[0];
+    points[0] = Vec(0.1, -10.0 + x * (eye[1] - 10.0 * epsilon + 10), -0.8);
+    points[1] = intersectLineWithPlane(Line(eye, points[0] - eye), canvas);
+    segment.b = points[0];
+  } else if (150 <= animation_counter) {
+    const double x = (double)(animation_counter - 150) / 149.0;
+    Segment &segment = segments[1];
+    points[0] = Vec(0.1, eye[1] + 100.0 * epsilon + x * 10.0, -0.8);
+    points[1] = intersectLineWithPlane(Line(eye, points[0] - eye), canvas);
+    segment.b = points[0];
+  } else {
+    // Wait
+  }
+
   updateGL();
 }
 
@@ -396,16 +414,15 @@ void MyViewer::animate(int type)
     timer->start(50);
     break;
   case 3:
-    eye = Vec(0, -1.4, 0.7);
-    canvas.p = Vec(0, -0.8, 0);
-    segments.clear();
-    segments.push_back(Segment(Vec(-0.3, 0.5, -0.8), Vec(0.7, -0.6, -0.8)));
-    points.resize(1);
-    show_infinite = INF_NONE;
+    eye = Vec(0, -0.3, -0.2);
+    canvas.p = Vec(0, 0, -0.5);
+    segments.resize(1);
+    points.resize(2);
+    show_infinite = INF_BOTH;
 
-    camera()->setPosition(Vec(3.38021, -1.95618, 0.171107));
-    camera()->setUpVector(Vec(-0.0171574, 0.0576644, 0.998189));
-    camera()->setViewDirection(Vec(-0.864684, 0.500405, -0.0437706));
+    camera()->setPosition(Vec(3.00051, -0.839958, -0.225271));
+    camera()->setUpVector(Vec(-0.0644347, 0.0180984, 0.997758));
+    camera()->setViewDirection(Vec(-0.95405, 0.292081, -0.0669102));
 
     animation_counter = 0;
     connect(timer, SIGNAL(timeout()), this, SLOT(animation3()));
@@ -416,7 +433,7 @@ void MyViewer::animate(int type)
     canvas.p = Vec(0, -0.8, 0);
     segments.clear();
     points.clear();
-    show_infinite = INF_NONE;
+    show_infinite = INF_HORIZON;
 
     animation_counter = 0;
     connect(timer, SIGNAL(timeout()), this, SLOT(animation4()));
@@ -427,7 +444,7 @@ void MyViewer::animate(int type)
     canvas.p = Vec(0, -0.8, 0);
     segments.clear();
     points.clear();
-    show_infinite = INF_NONE;
+    show_infinite = INF_HORIZON;
 
     animation_counter = 0;
     connect(timer, SIGNAL(timeout()), this, SLOT(animation4()));
@@ -438,7 +455,7 @@ void MyViewer::animate(int type)
     canvas.p = Vec(0, -0.8, 0);
     segments.clear();
     points.clear();
-    show_infinite = INF_NONE;
+    show_infinite = INF_HORIZON;
 
     animation_counter = 0;
     connect(timer, SIGNAL(timeout()), this, SLOT(animation4()));
