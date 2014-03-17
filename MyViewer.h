@@ -22,6 +22,7 @@ public:
 public slots:
   void animate(int type);
   void animation1();
+  void animation2();
 
 protected:
   virtual void init();
@@ -29,12 +30,14 @@ protected:
 
 private:
   void drawPlane(const Plane &plane) const; // only handles xyz planes
+  void drawLine(const Line &line) const;    // only handles lines in xyz planes
   void drawSegment(const Segment &segment) const;
   static Vec intersectLineWithPlane(const Line &line, const Plane &plane);
 
   static const double epsilon = 1.0e-7;
   Vec eye;
   Plane canvas, table;
+  Line line;
   Segment segment;
   Vec point;
   QTimer *timer;

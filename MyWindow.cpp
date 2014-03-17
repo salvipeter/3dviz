@@ -1,4 +1,3 @@
-#include <QApplication>
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QSignalMapper>
@@ -6,7 +5,7 @@
 
 #include "MyWindow.h"
 
-MyWindow::MyWindow(QApplication *parent) : QWidget(), parent(parent)
+MyWindow::MyWindow() : QWidget()
 {
   setWindowTitle(tr("3D Visualization"));
 
@@ -14,7 +13,7 @@ MyWindow::MyWindow(QApplication *parent) : QWidget(), parent(parent)
   QVBoxLayout *vbox = new QVBoxLayout;
   QHBoxLayout *hbox = new QHBoxLayout;
 
-  QString texts[] = { "", tr("Points"), tr("Undefined"), tr("Undefined"), tr("Camera Data") };
+  QString texts[] = { "", tr("Line tracing"), tr("Horizon"), tr("Undefined"), tr("Camera Data") };
   QSignalMapper *mapper = new QSignalMapper(this);
   for (size_t i = 1; i <= 4; ++i) {
     QPushButton *button = new QPushButton(texts[i]);

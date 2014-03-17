@@ -67,6 +67,14 @@ void MyViewer::drawPlane(const MyViewer::Plane &plane) const
   glEnd();
 }
 
+void MyViewer::drawLine(const MyViewer::Line &line) const
+{
+  Segment s;
+  s.a = line.p - line.d * 100.0;
+  s.b = line.p + line.d * 100.0;
+  drawSegment(s);
+}
+
 void MyViewer::drawSegment(const MyViewer::Segment &segment) const
 {
   glBegin(GL_LINES);
@@ -80,7 +88,7 @@ void MyViewer::draw()
   glColor4d(0.0, 1.0, 0.0, 0.5);
   drawPlane(canvas);
 
-  glColor4d(1.0, 1.0, 0.0, 0.5);
+  glColor4d(1.0, 0.0, 0.0, 0.5);
   drawPlane(table);
 
   glDisable(GL_DEPTH_TEST);
@@ -124,6 +132,7 @@ Vec MyViewer::intersectLineWithPlane(const MyViewer::Line &line, const MyViewer:
 void MyViewer::animation1()
 {
   if (++animation_counter == 100) {
+    timer->stop();
     timer->disconnect();
     return;
   }
@@ -133,12 +142,42 @@ void MyViewer::animation1()
   updateGL();
 }
 
+void MyViewer::animation2()
+{
+  if (++animation_counter == 300) {
+    timer->stop();
+    timer->disconnect();
+    return;
+  }
+
+  const double x = (double)animation_counter / 100.0;
+  segment.a = Vec(-100, -0.5 + x * 5, -0.8);
+  segment.b = Vec(100, -0.5 + x * 5, -0.8);
+  updateGL();
+}
+
 void MyViewer::animate(int type)
 {
+  if (timer->isActive())           // Already running an animation
+    return;
+
   switch(type) {
   case 1:
+    camera()->setPosition(Vec(3.38021, -1.95618, 0.171107));
+    camera()->setUpVector(Vec(-0.0171574, 0.0576644, 0.998189));
+    camera()->setViewDirection(Vec(-0.864684, 0.500405, -0.0437706));
+
+    segment.a = Vec(-0.3, 0.5, -0.8);
+    segment.b = Vec(0.7, -0.6, -0.8);
+
     animation_counter = 0;
     connect(timer, SIGNAL(timeout()), this, SLOT(animation1()));
+    timer->start(50);
+    break;
+  case 2:
+    point = eye;                // hides the ray
+    animation_counter = 0;
+    connect(timer, SIGNAL(timeout()), this, SLOT(animation2()));
     timer->start(50);
     break;
   case 4:
