@@ -1,20 +1,5 @@
 #include "MyViewer.h"
 
-#ifdef WIN32
- #include <windows.h>
-#else
- #include <unistd.h>
-#endif
-
-void sleepMilliSeconds(size_t ms)
-{
-#ifdef WIN32
-  Sleep(ms);
-#else
-  usleep(ms * 1000);
-#endif
-}
-
 using qglviewer::Vec;
 
 MyViewer::MyViewer(QWidget *parent) :
@@ -28,6 +13,7 @@ MyViewer::MyViewer(QWidget *parent) :
   segment.a = Vec(-0.3, 0.5, -0.8);
   segment.b = Vec(0.7, -0.6, -0.8);
   point = segment.a;
+  timer = new QTimer(this);
 }
 
 MyViewer::~MyViewer()
@@ -135,15 +121,25 @@ Vec MyViewer::intersectLineWithPlane(const MyViewer::Line &line, const MyViewer:
   return line.p + line.d * x;
 }
 
+void MyViewer::animation1()
+{
+  if (++animation_counter == 100) {
+    timer->disconnect();
+    return;
+  }
+
+  const double x = (double)animation_counter / 100.0;
+  point = segment.a + x * (segment.b - segment.a);
+  updateGL();
+}
+
 void MyViewer::animate(int type)
 {
   switch(type) {
   case 1:
-    for (double x = 0; x <= 1.0; x += 0.005) {
-      point = segment.a + x * (segment.b - segment.a);
-      updateGL();
-      sleepMilliSeconds(50);
-    }
+    animation_counter = 0;
+    connect(timer, SIGNAL(timeout()), this, SLOT(animation1()));
+    timer->start(50);
     break;
   case 4:
     std::cout << "Position: " << camera()->position()[0] << ", " << camera()->position()[1]

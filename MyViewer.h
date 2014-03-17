@@ -1,11 +1,11 @@
 // -*- mode: c++ -*-
 #pragma once
 
-#include <string>
-
 #include <QGLViewer/qglviewer.h>
 
 using qglviewer::Vec;
+
+class QTimer;
 
 class MyViewer : public QGLViewer
 {
@@ -21,6 +21,7 @@ public:
 
 public slots:
   void animate(int type);
+  void animation1();
 
 protected:
   virtual void init();
@@ -36,4 +37,6 @@ private:
   Plane canvas, table;
   Segment segment;
   Vec point;
+  QTimer *timer;
+  size_t animation_counter;
 };
