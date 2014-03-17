@@ -1,6 +1,8 @@
 // -*- mode: c++ -*-
 #pragma once
 
+#include <vector>
+
 #include <QGLViewer/qglviewer.h>
 
 using qglviewer::Vec;
@@ -52,12 +54,12 @@ private:
   void drawCubeOutline(const Vec *vertices) const;
   static Vec intersectLineWithPlane(const Line &line, const Plane &plane);
 
-  static const double epsilon = 1.0e-7;
+  static const double epsilon = 1.0e-7, plane_size = 1.0;
   Vec eye;
   Plane canvas, table;
-  Line line;
-  Segment segment;
-  Vec point;
+  std::vector<Segment> segments;
+  std::vector<Vec> points;
   QTimer *timer;
   size_t animation_type, animation_counter;
+  enum InfinitePointType { INF_NONE, INF_HORIZON, INF_FOOT, INF_BOTH } show_infinite;
 };
