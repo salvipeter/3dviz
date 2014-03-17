@@ -34,9 +34,9 @@ void MyViewer::init()
 
   glDisable(GL_LIGHTING);
 
-  camera()->setPosition(Vec(3.38021, -1.95618, 0.171107));
-  camera()->setUpVector(Vec(-0.0171574, 0.0576644, 0.998189));
-  camera()->setViewDirection(Vec(-0.864684, 0.500405, -0.0437706));
+  camera()->setPosition(Vec(0, -3.3, 0));
+  camera()->setUpVector(Vec(0, 0, 1));
+  camera()->setViewDirection(Vec(0, 1, 0));
 }
 
 void MyViewer::drawPlane(const MyViewer::Plane &plane) const
@@ -120,11 +120,11 @@ void MyViewer::draw()
 {
   const Vec x(1, 0, 0), y(0, 1, 0), z(0, 0, 1);
 
+  glColor4d(0.6, 0.4, 0.3, 1.0);
+  drawPlane(table);
+
   glColor4d(0.0, 1.0, 0.0, 0.5);
   drawPlane(canvas);
-
-  glColor4d(1.0, 0.0, 0.0, 0.5);
-  drawPlane(table);
 
   glDisable(GL_DEPTH_TEST);
   glColor3d(0.0, 1.0, 1.0);
