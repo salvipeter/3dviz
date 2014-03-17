@@ -281,7 +281,8 @@ void MyViewer::animation2()
   } else if (266 <= animation_counter && animation_counter < 366) {
     const double x = (double)(animation_counter - 266) / 99.0;
     // Move point along -y
-    points[0] = Vec(0.1, x * (eye[1] - epsilon), -0.8);
+    points[0] = Vec(0.1, x * (eye[1] + 100 * epsilon), -0.8);
+    points[0] = intersectLineWithPlane(Line(eye, points[0] - eye), canvas);
     segments[0].b = points[0];
   } else if (399 <= animation_counter && animation_counter < 499) {
     const double x = (double)(animation_counter - 399) / 99.0;
@@ -320,13 +321,13 @@ void MyViewer::animation3()
     segments[0].a = Vec(0.1, -10.0, -0.8);
   else if (animation_counter == 150) {
     points.resize(2);
-    segments.push_back(Segment(Vec(0.1, eye[1] + 10.0 * epsilon, -0.8), Vec(0.1, 10.0, -0.8)));
+    segments.push_back(Segment(Vec(0.1, eye[1] + 100.0 * epsilon, -0.8), Vec(0.1, 10.0, -0.8)));
   }
 
   if (animation_counter < 100) {
     const double x = (double)animation_counter / 99.0;
     Segment &segment = segments[0];
-    points[0] = Vec(0.1, -10.0 + x * (eye[1] - 10.0 * epsilon + 10), -0.8);
+    points[0] = Vec(0.1, -10.0 + x * (eye[1] - 100.0 * epsilon + 10), -0.8);
     points[1] = intersectLineWithPlane(Line(eye, points[0] - eye), canvas);
     segment.b = points[0];
   } else if (150 <= animation_counter) {
