@@ -14,9 +14,10 @@ MyWindow::MyWindow(QApplication *parent) : QWidget(), parent(parent)
   QVBoxLayout *vbox = new QVBoxLayout;
   QHBoxLayout *hbox = new QHBoxLayout;
 
+  QString texts[] = { "", tr("Points"), tr("Undefined"), tr("Undefined"), tr("Camera Data") };
   QSignalMapper *mapper = new QSignalMapper(this);
   for (size_t i = 1; i <= 4; ++i) {
-    QPushButton *button = new QPushButton(QString(tr("Animation %1")).arg(i));
+    QPushButton *button = new QPushButton(texts[i]);
     connect(button, SIGNAL(clicked()), mapper, SLOT(map()));
     mapper->setMapping(button, i);
     hbox->addWidget(button);
