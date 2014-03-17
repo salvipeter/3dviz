@@ -28,6 +28,7 @@ MyWindow::MyWindow() : QWidget()
   vbox->addWidget(viewer);
   vbox->addLayout(hbox);
   setLayout(vbox);
+  showMaximized();
 }
 
 MyWindow::~MyWindow()

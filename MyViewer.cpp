@@ -3,16 +3,13 @@
 using qglviewer::Vec;
 
 MyViewer::MyViewer(QWidget *parent) :
-  QGLViewer(parent)
+  QGLViewer(parent), animation_type(0)
 {
   eye = Vec(0, -1.4, 0.7);
   canvas.p = Vec(0, -0.8, 0);
   canvas.n = Vec(0, 1, 0);
   table.p = Vec(0, 0, -0.8);
   table.n = Vec(0, 0, 1);
-  segment.a = Vec(-0.3, 0.5, -0.8);
-  segment.b = Vec(0.7, -0.6, -0.8);
-  point = segment.a;
   timer = new QTimer(this);
 }
 
@@ -83,6 +80,42 @@ void MyViewer::drawSegment(const MyViewer::Segment &segment) const
   glEnd();
 }
 
+void MyViewer::drawCube(const Vec *a) const
+{
+  glBegin(GL_POLYGON);
+  glVertex3fv(a[0]); glVertex3fv(a[1]); glVertex3fv(a[2]); glVertex3fv(a[3]); 
+  glEnd();
+  glBegin(GL_POLYGON);
+  glVertex3fv(a[4]); glVertex3fv(a[5]); glVertex3fv(a[6]); glVertex3fv(a[7]); 
+  glEnd();
+  glBegin(GL_POLYGON);
+  glVertex3fv(a[0]); glVertex3fv(a[1]); glVertex3fv(a[5]); glVertex3fv(a[4]); 
+  glEnd();
+  glBegin(GL_POLYGON);
+  glVertex3fv(a[3]); glVertex3fv(a[2]); glVertex3fv(a[6]); glVertex3fv(a[7]); 
+  glEnd();
+  glBegin(GL_POLYGON);
+  glVertex3fv(a[0]); glVertex3fv(a[4]); glVertex3fv(a[7]); glVertex3fv(a[3]); 
+  glEnd();
+  glBegin(GL_POLYGON);
+  glVertex3fv(a[1]); glVertex3fv(a[5]); glVertex3fv(a[6]); glVertex3fv(a[2]); 
+  glEnd();
+}
+
+void MyViewer::drawCubeOutline(const Vec *a) const
+{
+  glBegin(GL_LINE_LOOP);
+  glVertex3fv(a[0]); glVertex3fv(a[1]); glVertex3fv(a[2]); glVertex3fv(a[3]); 
+  glEnd();
+  glBegin(GL_LINE_LOOP);
+  glVertex3fv(a[4]); glVertex3fv(a[5]); glVertex3fv(a[6]); glVertex3fv(a[7]); 
+  glEnd();
+  glBegin(GL_LINES);
+  glVertex3fv(a[0]); glVertex3fv(a[4]); glVertex3fv(a[1]); glVertex3fv(a[5]); 
+  glVertex3fv(a[2]); glVertex3fv(a[6]); glVertex3fv(a[3]); glVertex3fv(a[7]); 
+  glEnd();
+}
+
 void MyViewer::draw()
 {
   const Vec x(1, 0, 0), y(0, 1, 0), z(0, 0, 1);
@@ -100,7 +133,8 @@ void MyViewer::draw()
   glEnd();
   glEnable(GL_DEPTH_TEST);
 
-  if (animation_type == 1) {
+  if (animation_type == 0) {
+  } else if (animation_type == 1) {
     const double cube_size = 0.25;
     Vec a[8], b[8];
     Line l[8];
@@ -124,54 +158,17 @@ void MyViewer::draw()
     for (size_t i = 0; i < 8; ++i)
       drawSegment(s[i]);
     glColor3d(1.0, 1.0, 1.0);
-    glBegin(GL_POLYGON);
-    glVertex3fv(a[0]); glVertex3fv(a[1]); glVertex3fv(a[2]); glVertex3fv(a[3]); 
-    glEnd();
-    glBegin(GL_POLYGON);
-    glVertex3fv(a[4]); glVertex3fv(a[5]); glVertex3fv(a[6]); glVertex3fv(a[7]); 
-    glEnd();
-    glBegin(GL_POLYGON);
-    glVertex3fv(a[0]); glVertex3fv(a[1]); glVertex3fv(a[5]); glVertex3fv(a[4]); 
-    glEnd();
-    glBegin(GL_POLYGON);
-    glVertex3fv(a[3]); glVertex3fv(a[2]); glVertex3fv(a[6]); glVertex3fv(a[7]); 
-    glEnd();
-    glBegin(GL_POLYGON);
-    glVertex3fv(a[0]); glVertex3fv(a[4]); glVertex3fv(a[7]); glVertex3fv(a[3]); 
-    glEnd();
-    glBegin(GL_POLYGON);
-    glVertex3fv(a[1]); glVertex3fv(a[5]); glVertex3fv(a[6]); glVertex3fv(a[2]); 
-    glEnd();
+    drawCube(a);
     glColor3d(0, 0, 0);
-    glBegin(GL_LINE_LOOP);
-    glVertex3fv(a[0]); glVertex3fv(a[1]); glVertex3fv(a[2]); glVertex3fv(a[3]); 
-    glEnd();
-    glBegin(GL_LINE_LOOP);
-    glVertex3fv(a[4]); glVertex3fv(a[5]); glVertex3fv(a[6]); glVertex3fv(a[7]); 
-    glEnd();
-    glBegin(GL_LINES);
-    glVertex3fv(a[0]); glVertex3fv(a[4]); glVertex3fv(a[1]); glVertex3fv(a[5]); 
-    glVertex3fv(a[2]); glVertex3fv(a[6]); glVertex3fv(a[3]); glVertex3fv(a[7]); 
-    glEnd();
-    glBegin(GL_LINE_LOOP);
-    glVertex3fv(b[0]); glVertex3fv(b[1]); glVertex3fv(b[2]); glVertex3fv(b[3]); 
-    glEnd();
-    glBegin(GL_LINE_LOOP);
-    glVertex3fv(b[4]); glVertex3fv(b[5]); glVertex3fv(b[6]); glVertex3fv(b[7]); 
-    glEnd();
-    glBegin(GL_LINES);
-    glVertex3fv(b[0]); glVertex3fv(b[4]); glVertex3fv(b[1]); glVertex3fv(b[5]); 
-    glVertex3fv(b[2]); glVertex3fv(b[6]); glVertex3fv(b[3]); glVertex3fv(b[7]); 
-    glEnd();
+    drawCubeOutline(a);
+    drawCubeOutline(b);
   } else {
     glDisable(GL_DEPTH_TEST);
     glColor3d(0.0, 0.0, 0.0);
     drawSegment(segment);
     
     Segment s;
-    Line l;
-    l.p = eye;
-    l.d = segment.a - eye;
+    Line l(eye, segment.a - eye);
     s.a = intersectLineWithPlane(l, canvas);
     l.d = segment.b - eye;
     s.b = intersectLineWithPlane(l, canvas);

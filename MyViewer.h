@@ -48,6 +48,8 @@ private:
   void drawPlane(const Plane &plane) const; // only handles xyz planes
   void drawLine(const Line &line) const;    // only handles lines in xyz planes
   void drawSegment(const Segment &segment) const;
+  void drawCube(const Vec *vertices) const;
+  void drawCubeOutline(const Vec *vertices) const;
   static Vec intersectLineWithPlane(const Line &line, const Plane &plane);
 
   static const double epsilon = 1.0e-7;
