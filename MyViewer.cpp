@@ -225,6 +225,14 @@ void MyViewer::draw()
     drawSegment(s);
   }
 
+  // Draw flash points
+  for (size_t i = 0; i < flashes.size(); ++i) {
+    glColor3d(0.8, 0.8, 0.8);
+    glBegin(GL_POINTS);
+    glVertex3fv(flashes[i]);
+    glEnd();
+  }
+
   if (show_infinite == INF_HORIZON || show_infinite == INF_BOTH) {
     Segment s(Vec(canvas.p[0] - plane_size, canvas.p[1], eye[2]),
               Vec(canvas.p[0] + plane_size, canvas.p[1], eye[2]));
@@ -412,8 +420,7 @@ void MyViewer::animation5()
 
 void MyViewer::animation6()
 {
-  if (++animation_counter == 100) {
-    planes.push_back(Plane(segments[0], eye));
+  if (++animation_counter == 351) {
     points.clear();
     updateGL();
     timer->stop();
@@ -421,9 +428,35 @@ void MyViewer::animation6()
     return;
   }
 
-  const double x = (double)animation_counter / 99.0;
-  const Segment &segment = segments[0];
-  points[0] = segment.a + x * (segment.b - segment.a);
+  switch(animation_counter) {
+  case 150:
+    points.clear();
+    planes.push_back(Plane(segments[0], eye));
+    break;
+  case 201:
+    points.resize(1);
+    flashes.clear();
+    break;
+  }
+
+  if (animation_counter < 150) {
+    const double x = (double)animation_counter / 149.0;
+    const Segment &segment = segments[0];
+    points[0] = segment.a + x * x * (segment.b - segment.a);
+    if (animation_counter % 10 == 0) {
+      flashes.push_back(points[0]);
+      flashes.push_back(intersectLineWithPlane(Line(eye, points[0] - eye), canvas));
+    }
+  } else if (201 <= animation_counter) {
+    const double x = (double)(animation_counter - 201) / 149.0;
+    const Segment &segment = segments[0];
+    points[0] = segment.a + x * x * (segment.b - segment.a);
+    if (animation_counter % 10 == 0) {
+      flashes.push_back(points[0]);
+      flashes.push_back(intersectLineWithPlane(Line(eye, points[0] - eye), canvas));
+    }
+  }
+
   updateGL();
 }
 
@@ -492,6 +525,7 @@ void MyViewer::animate(int type)
     segments.clear();
     points.resize(1);
     planes.clear();
+    flashes.clear();
     show_infinite = INF_NONE;
 
     camera()->setPosition(Vec(3.28356, 0.708553, 0.581566));
@@ -508,6 +542,7 @@ void MyViewer::animate(int type)
     segments.resize(1);
     points.resize(1);
     planes.clear();
+    flashes.clear();
     show_infinite = INF_NONE;
 
     camera()->setPosition(Vec(3.14783, -1.18086, -0.14118));
@@ -524,6 +559,7 @@ void MyViewer::animate(int type)
     segments.resize(1);
     points.resize(1);
     planes.clear();
+    flashes.clear();
     show_infinite = INF_NONE;
 
     camera()->setPosition(Vec(3.14783, -1.18086, -0.14118));
@@ -540,6 +576,7 @@ void MyViewer::animate(int type)
     segments.resize(1);
     points.resize(1);
     planes.clear();
+    flashes.clear();
     show_infinite = INF_BOTH;
 
     camera()->setPosition(Vec(3.14783, -1.18086, -0.14118));
@@ -556,6 +593,7 @@ void MyViewer::animate(int type)
     segments.resize(1);
     points.resize(2);
     planes.clear();
+    flashes.clear();
     show_infinite = INF_BOTH;
 
     camera()->setPosition(Vec(3.00051, -0.839958, -0.225271));
@@ -570,14 +608,15 @@ void MyViewer::animate(int type)
     eye = Vec(0, -1.4, 0.7);
     canvas.p = Vec(0, -0.8, 0);
     segments.clear();
-    segments.push_back(Segment(Vec(0.3, -0.2, -0.8), Vec(0.6, 0.8, -0.8)));
+    segments.push_back(Segment(Vec(0.6, -0.6, -0.8), Vec(0.6, 100.0, -0.8)));
     points.resize(1);
     planes.clear();
+    flashes.clear();
     show_infinite = INF_HORIZON;
 
-    camera()->setPosition(Vec(3.06833, 0.110576, 0.896283));
-    camera()->setUpVector(Vec(-0.321134, -0.0518585, 0.945613));
-    camera()->setViewDirection(Vec(-0.943686, -0.0663609, -0.324119));
+    camera()->setPosition(Vec(4.69493, -4.76521, 2.54081));
+    camera()->setUpVector(Vec(-0.305691, 0.213557, 0.927872));
+    camera()->setViewDirection(Vec(-0.612017, 0.702455, -0.363307));
 
     animation_counter = 0;
     connect(timer, SIGNAL(timeout()), this, SLOT(animation6()));
@@ -593,6 +632,7 @@ void MyViewer::animate(int type)
     segments.push_back(Segment(Vec(0.6, -0.5, -0.8), Vec(0.6, -0.5, -0.8)));
     points.resize(4);
     planes.clear();
+    flashes.clear();
     show_infinite = INF_HORIZON;
 
     camera()->setPosition(Vec(3.06833, 0.110576, 0.896283));
@@ -614,6 +654,7 @@ void MyViewer::animate(int type)
     points.clear();
     planes.clear();
     planes.push_back(Plane(segments[3], eye));
+    flashes.clear();
     show_infinite = INF_HORIZON;
 
     camera()->setPosition(Vec(3.06833, 0.110576, 0.896283));

@@ -13,9 +13,9 @@ MyWindow::MyWindow() : QWidget()
   QVBoxLayout *vbox = new QVBoxLayout;
   QHBoxLayout *hbox = new QHBoxLayout;
 
-  QString texts[] = { "", tr("Kocka"), tr("Pontok elöl"), tr("Pontok hátul"), tr("Pontok képe"),
-                      tr("Egyenes képe"), tr("Sugársík"), tr("Párhuzamosok"),
-                      tr("Párhuzamosok síkjai"), tr("Kamera info") };
+  QString texts[] = { "", tr("Kocka"), tr("Elöl"), tr("Hátul"), tr("Pontok képe"),
+                      tr("Egyenes"), tr("Sugársík"), tr("Párhuzamosok"),
+                      tr("Síkok"), tr("Kamera info") };
   QSignalMapper *mapper = new QSignalMapper(this);
   for (size_t i = 1; i < 9; ++i) {
     QPushButton *button = new QPushButton(texts[i]);

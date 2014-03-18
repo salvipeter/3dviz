@@ -67,7 +67,7 @@ private:
   Vec eye;
   Plane canvas, table;
   std::vector<Segment> segments;
-  std::vector<Vec> points;
+  std::vector<Vec> points, flashes;
   std::vector<Plane> planes;
   QTimer *timer;
   size_t animation_type, animation_counter;
