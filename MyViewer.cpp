@@ -63,8 +63,24 @@ void MyViewer::drawPlane(const MyViewer::Plane &plane) const
   glEnd();
 }
 
-void MyViewer::drawGeneralPlane(const MyViewer::Plane &) const
+void MyViewer::drawGeneralPlane(const MyViewer::Plane &plane) const
 {
+  // Assume that the normal is not in z
+  const double bottom = table.p[2] - 0.1, top = eye[2] + 0.1;
+  const double left = canvas.p[1] - 0.1, right = table.p[1] + plane_size + 0.1;
+
+  glBegin(GL_POLYGON);
+  glVertex3fv(intersectLineWithPlane(Line(Vec(0, left, top), Vec(1, 0, 0)), plane));
+  glVertex3fv(intersectLineWithPlane(Line(Vec(0, right, top), Vec(1, 0, 0)), plane));
+  glVertex3fv(intersectLineWithPlane(Line(Vec(0, right, bottom), Vec(1, 0, 0)), plane));
+  glVertex3fv(intersectLineWithPlane(Line(Vec(0, left, bottom), Vec(1, 0, 0)), plane));
+  glEnd();
+
+  glColor3d(0.8, 0.2, 0.2);
+  glBegin(GL_LINES);
+  glVertex3fv(intersectLineWithPlane(Line(Vec(0, left, eye[2]), Vec(1, 0, 0)), plane));
+  glVertex3fv(intersectLineWithPlane(Line(Vec(0, right, eye[2]), Vec(1, 0, 0)), plane));
+  glEnd();
 }
 
 void MyViewer::drawSegment(const MyViewer::Segment &segment) const
@@ -115,7 +131,7 @@ void MyViewer::draw()
 {
   const Vec x(1, 0, 0), y(0, 1, 0), z(0, 0, 1);
 
-  // Draw the planes
+  // Draw the main planes
   glColor4d(0.6, 0.4, 0.3, 1.0);
   drawPlane(table);
   glColor4d(0.0, 1.0, 0.0, 0.5);
@@ -201,6 +217,12 @@ void MyViewer::draw()
               Vec(table.p[0] + plane_size, eye[1], table.p[2]));
     glColor3d(1.0, 0.0, 0.0);
     drawSegment(s);
+  }
+
+  // Draw all secondary planes
+  for (size_t i = 0; i < planes.size(); ++i) {
+    glColor4d(1.0, 1.0, 0.0, 0.5);
+    drawGeneralPlane(planes[i]);
   }
 }
 
@@ -346,11 +368,17 @@ void MyViewer::animation3()
 void MyViewer::animation4()
 {
   if (++animation_counter == 100) {
+    planes.push_back(Plane(segments[0], eye));
+    points.clear();
+    updateGL();
     timer->stop();
     timer->disconnect();
     return;
   }
 
+  const double x = (double)animation_counter / 99.0;
+  const Segment &segment = segments[0];
+  points[0] = segment.a + x * (segment.b - segment.a);
   updateGL();
 }
 
@@ -389,6 +417,7 @@ void MyViewer::animate(int type)
     canvas.p = Vec(0, -0.8, 0);
     segments.clear();
     points.resize(1);
+    planes.clear();
     show_infinite = INF_NONE;
 
     camera()->setPosition(Vec(3.28356, 0.708553, 0.581566));
@@ -404,6 +433,7 @@ void MyViewer::animate(int type)
     canvas.p = Vec(0, 0, -0.5);
     segments.resize(1);
     points.resize(1);
+    planes.clear();
     show_infinite = INF_NONE;
 
     camera()->setPosition(Vec(3.14783, -1.18086, -0.14118));
@@ -419,6 +449,7 @@ void MyViewer::animate(int type)
     canvas.p = Vec(0, 0, -0.5);
     segments.resize(1);
     points.resize(2);
+    planes.clear();
     show_infinite = INF_BOTH;
 
     camera()->setPosition(Vec(3.00051, -0.839958, -0.225271));
@@ -433,8 +464,14 @@ void MyViewer::animate(int type)
     eye = Vec(0, -1.4, 0.7);
     canvas.p = Vec(0, -0.8, 0);
     segments.clear();
-    points.clear();
+    segments.push_back(Segment(Vec(0.3, -0.2, -0.8), Vec(0.6, 0.8, -0.8)));
+    points.resize(1);
+    planes.clear();
     show_infinite = INF_HORIZON;
+
+    camera()->setPosition(Vec(3.06833, 0.110576, 0.896283));
+    camera()->setUpVector(Vec(-0.321134, -0.0518585, 0.945613));
+    camera()->setViewDirection(Vec(-0.943686, -0.0663609, -0.324119));
 
     animation_counter = 0;
     connect(timer, SIGNAL(timeout()), this, SLOT(animation4()));
@@ -445,6 +482,7 @@ void MyViewer::animate(int type)
     canvas.p = Vec(0, -0.8, 0);
     segments.clear();
     points.clear();
+    planes.clear();
     show_infinite = INF_HORIZON;
 
     animation_counter = 0;
@@ -456,6 +494,7 @@ void MyViewer::animate(int type)
     canvas.p = Vec(0, -0.8, 0);
     segments.clear();
     points.clear();
+    planes.clear();
     show_infinite = INF_HORIZON;
 
     animation_counter = 0;

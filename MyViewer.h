@@ -17,20 +17,24 @@ public:
   MyViewer(QWidget *parent);
   virtual ~MyViewer();
 
+  struct Segment {
+    Vec a, b;
+    Segment() { }
+    Segment(Vec a, Vec b) : a(a), b(b) { }
+  };
   struct Plane {
     Vec p, n;
     Plane() { }
     Plane(Vec p, Vec n) : p(p), n(n) { }
+    Plane(Segment s, Vec p) : p((s.a + p)/2.0) {
+      // Assume that s.a is not p
+      n = ((s.a - p) ^ (s.b - s.a)).unit();
+    }
   };
   struct Line {
     Vec p, d;
     Line() { }
     Line(Vec p, Vec d) : p(p), d(d) { }
-  };
-  struct Segment {
-    Vec a, b;
-    Segment() { }
-    Segment(Vec a, Vec b) : a(a), b(b) { }
   };
 
 public slots:
@@ -59,6 +63,7 @@ private:
   Plane canvas, table;
   std::vector<Segment> segments;
   std::vector<Vec> points;
+  std::vector<Plane> planes;
   QTimer *timer;
   size_t animation_type, animation_counter;
   enum InfinitePointType { INF_NONE, INF_HORIZON, INF_FOOT, INF_BOTH } show_infinite;

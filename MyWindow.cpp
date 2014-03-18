@@ -14,7 +14,7 @@ MyWindow::MyWindow() : QWidget()
   QHBoxLayout *hbox = new QHBoxLayout;
 
   QString texts[] = { "", tr("Kocka"), tr("Pontok képe"), tr("Egyenes képe"),
-                      tr("Sugársíkok"), tr("Párhuzamosok"), tr("Párhuzamosok síkjai"),
+                      tr("Sugársík"), tr("Párhuzamosok"), tr("Párhuzamosok síkjai"),
                       tr("Kamera info") };
   QSignalMapper *mapper = new QSignalMapper(this);
   for (size_t i = 1; i <= 7; ++i) {
