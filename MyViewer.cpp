@@ -385,9 +385,17 @@ void MyViewer::animation4()
 void MyViewer::animation5()
 {
   if (++animation_counter == 100) {
+    points.clear();
+    updateGL();
     timer->stop();
     timer->disconnect();
     return;
+  }
+
+  const double x = (double)animation_counter / 99.0;
+  for (size_t i = 0; i < segments.size(); ++i) {
+    points[i] = segments[i].a + x * x * 100.0 * Vec(0.1, 1.0, 0.0);
+    segments[i].b = points[i];
   }
 
   updateGL();
@@ -481,12 +489,20 @@ void MyViewer::animate(int type)
     eye = Vec(0, -1.4, 0.7);
     canvas.p = Vec(0, -0.8, 0);
     segments.clear();
-    points.clear();
+    segments.push_back(Segment(Vec(-0.5, -0.5, -0.8), Vec(-0.5, -0.5, -0.8)));
+    segments.push_back(Segment(Vec(-0.2, -0.5, -0.8), Vec(-0.2, -0.5, -0.8)));
+    segments.push_back(Segment(Vec(0.3, -0.5, -0.8), Vec(0.3, -0.5, -0.8)));
+    segments.push_back(Segment(Vec(0.6, -0.5, -0.8), Vec(0.6, -0.5, -0.8)));
+    points.resize(4);
     planes.clear();
     show_infinite = INF_HORIZON;
 
+    camera()->setPosition(Vec(3.06833, 0.110576, 0.896283));
+    camera()->setUpVector(Vec(-0.321134, -0.0518585, 0.945613));
+    camera()->setViewDirection(Vec(-0.943686, -0.0663609, -0.324119));
+
     animation_counter = 0;
-    connect(timer, SIGNAL(timeout()), this, SLOT(animation4()));
+    connect(timer, SIGNAL(timeout()), this, SLOT(animation5()));
     timer->start(50);
     break;
   case 6:
@@ -498,7 +514,7 @@ void MyViewer::animate(int type)
     show_infinite = INF_HORIZON;
 
     animation_counter = 0;
-    connect(timer, SIGNAL(timeout()), this, SLOT(animation4()));
+    connect(timer, SIGNAL(timeout()), this, SLOT(animation6()));
     timer->start(50);
     break;
   case 7:
