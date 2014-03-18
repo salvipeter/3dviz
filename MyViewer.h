@@ -39,12 +39,16 @@ public:
 
 public slots:
   void animate(int type);
+
+protected slots:
   void animation1();
   void animation2();
   void animation3();
   void animation4();
   void animation5();
   void animation6();
+  void animation7();
+  void animation8();
 
 protected:
   virtual void init();
@@ -59,7 +63,7 @@ private:
   void drawSphere(const Vec &p, double r) const;
   static Vec intersectLineWithPlane(const Line &line, const Plane &plane);
 
-  static const double epsilon = 1.0e-7, plane_size = 1.3;
+  static const double epsilon, plane_size;
   Vec eye;
   Plane canvas, table;
   std::vector<Segment> segments;
