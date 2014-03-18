@@ -462,7 +462,7 @@ void MyViewer::animation6()
 
 void MyViewer::animation7()
 {
-  if (++animation_counter == 100) {
+  if (++animation_counter == 200) {
     points.clear();
     updateGL();
     timer->stop();
@@ -470,7 +470,26 @@ void MyViewer::animation7()
     return;
   }
 
-  const double x = (double)animation_counter / 99.0;
+  const double x = (double)animation_counter / 199.0;
+  for (size_t i = 0; i < segments.size(); ++i) {
+    points[i] = segments[i].a + x * 2.0 * plane_size * Vec(1.0, 0.0, 0.0);
+    segments[i].b = points[i];
+  }
+
+  updateGL();
+}
+
+void MyViewer::animation8()
+{
+  if (++animation_counter == 200) {
+    points.clear();
+    updateGL();
+    timer->stop();
+    timer->disconnect();
+    return;
+  }
+
+  const double x = (double)animation_counter / 199.0;
   for (size_t i = 0; i < segments.size(); ++i) {
     points[i] = segments[i].a + x * x * 100.0 * Vec(0.1, 1.0, 0.0);
     segments[i].b = points[i];
@@ -479,7 +498,7 @@ void MyViewer::animation7()
   updateGL();
 }
 
-void MyViewer::animation8()
+void MyViewer::animation9()
 {
   if (++animation_counter == 7) {
     timer->stop();
@@ -626,6 +645,31 @@ void MyViewer::animate(int type)
     eye = Vec(0, -1.4, 0.7);
     canvas.p = Vec(0, -0.8, 0);
     segments.clear();
+    {
+      const double x = table.p[0] - plane_size;
+      segments.push_back(Segment(Vec(x, -0.5, -0.8), Vec(x, -0.5, -0.8)));
+      segments.push_back(Segment(Vec(x, -0.2, -0.8), Vec(x, -0.2, -0.8)));
+      segments.push_back(Segment(Vec(x, 0.1, -0.8), Vec(x, 0.1, -0.8)));
+      segments.push_back(Segment(Vec(x, 0.4, -0.8), Vec(x, 0.4, -0.8)));
+      segments.push_back(Segment(Vec(x, 0.7, -0.8), Vec(x, 0.7, -0.8)));
+    }
+    points.resize(5);
+    planes.clear();
+    flashes.clear();
+    show_infinite = INF_NONE;
+
+    camera()->setPosition(Vec(3.19036, 0.0388229, 0.913055));
+    camera()->setUpVector(Vec(-0.356683, -0.0835291, 0.930484));
+    camera()->setViewDirection(Vec(-0.929941, -0.0635316, -0.362178));
+
+    animation_counter = 0;
+    connect(timer, SIGNAL(timeout()), this, SLOT(animation7()));
+    timer->start(50);
+    break;
+  case 8:
+    eye = Vec(0, -1.4, 0.7);
+    canvas.p = Vec(0, -0.8, 0);
+    segments.clear();
     segments.push_back(Segment(Vec(-0.5, -0.5, -0.8), Vec(-0.5, -0.5, -0.8)));
     segments.push_back(Segment(Vec(-0.2, -0.5, -0.8), Vec(-0.2, -0.5, -0.8)));
     segments.push_back(Segment(Vec(0.3, -0.5, -0.8), Vec(0.3, -0.5, -0.8)));
@@ -640,10 +684,10 @@ void MyViewer::animate(int type)
     camera()->setViewDirection(Vec(-0.943686, -0.0663609, -0.324119));
 
     animation_counter = 0;
-    connect(timer, SIGNAL(timeout()), this, SLOT(animation7()));
+    connect(timer, SIGNAL(timeout()), this, SLOT(animation8()));
     timer->start(50);
     break;
-  case 8:
+  case 9:
     eye = Vec(0, -1.4, 0.7);
     canvas.p = Vec(0, -0.8, 0);
     segments.clear();
@@ -663,10 +707,10 @@ void MyViewer::animate(int type)
     updateGL();
 
     animation_counter = 0;
-    connect(timer, SIGNAL(timeout()), this, SLOT(animation8()));
+    connect(timer, SIGNAL(timeout()), this, SLOT(animation9()));
     timer->start(1500);
     break;
-  case 9:
+  case 10:
     std::cout << "camera()->setPosition(Vec(" << camera()->position()[0] << ", "
               << camera()->position()[1] << ", " << camera()->position()[2]
               << "));" << std::endl;

@@ -49,6 +49,7 @@ protected slots:
   void animation6();
   void animation7();
   void animation8();
+  void animation9();
 
 protected:
   virtual void init();
