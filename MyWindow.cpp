@@ -17,7 +17,7 @@ MyWindow::MyWindow() : QWidget()
                       tr("Sugársík"), tr("Párhuzamosok"), tr("Párhuzamosok síkjai"),
                       tr("Kamera info") };
   QSignalMapper *mapper = new QSignalMapper(this);
-  for (size_t i = 1; i <= 7; ++i) {
+  for (size_t i = 1; i < 7; ++i) {
     QPushButton *button = new QPushButton(texts[i]);
     connect(button, SIGNAL(clicked()), mapper, SLOT(map()));
     mapper->setMapping(button, i);

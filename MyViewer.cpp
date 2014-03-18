@@ -37,6 +37,9 @@ void MyViewer::init()
   camera()->setPosition(Vec(0, -3.3, 0));
   camera()->setUpVector(Vec(0, 0, 1));
   camera()->setViewDirection(Vec(0, 1, 0));
+
+  camera()->setSceneBoundingBox(Vec(-2.0, -100.0, -4.0),
+                                Vec(2.0, 100.0, 4.0));
 }
 
 void MyViewer::drawPlane(const MyViewer::Plane &plane) const
@@ -45,9 +48,9 @@ void MyViewer::drawPlane(const MyViewer::Plane &plane) const
   if (plane.n[0] == 0) {
     a = Vec(1, 0, 0);
     if (plane.n[1] == 0)
-      b = Vec(0, 1, 0);
+      b = Vec(0, 100, 0);
     else
-      b = Vec(0, 0, 1);
+      b = Vec(0, 0, 100);
   } else {
     a = Vec(0, 1, 0);
     b = Vec(0, 0, 1);
@@ -67,7 +70,7 @@ void MyViewer::drawGeneralPlane(const MyViewer::Plane &plane) const
 {
   // Assume that the normal is not in z
   const double bottom = table.p[2] - 0.1, top = eye[2] + 0.1;
-  const double left = canvas.p[1] - 0.1, right = table.p[1] + plane_size + 0.1;
+  const double left = eye[1] - 0.1, right = table.p[1] + plane_size + 0.1;
 
   glBegin(GL_POLYGON);
   glVertex3fv(intersectLineWithPlane(Line(Vec(0, left, top), Vec(1, 0, 0)), plane));
@@ -403,10 +406,34 @@ void MyViewer::animation5()
 
 void MyViewer::animation6()
 {
-  if (++animation_counter == 100) {
+  if (++animation_counter == 8) {
     timer->stop();
     timer->disconnect();
     return;
+  }
+
+  switch(animation_counter) {
+  case 1:
+    planes.push_back(Plane(segments[3], eye));
+    break;
+  case 2:
+    planes[0] = Plane(segments[2], eye);
+    break;
+  case 3:
+    planes[0] = Plane(segments[1], eye);
+    break;
+  case 4:
+    planes[0] = Plane(segments[0], eye);
+    break;
+  case 5:
+    planes.push_back(Plane(segments[1], eye));
+    break;
+  case 6:
+    planes.push_back(Plane(segments[2], eye));
+    break;
+  case 7:
+    planes.push_back(Plane(segments[3], eye));
+    break;
   }
 
   updateGL();
@@ -509,13 +536,22 @@ void MyViewer::animate(int type)
     eye = Vec(0, -1.4, 0.7);
     canvas.p = Vec(0, -0.8, 0);
     segments.clear();
+    segments.push_back(Segment(Vec(-0.5, -0.5, -0.8), Vec(9.5, 99.5, -0.8)));
+    segments.push_back(Segment(Vec(-0.2, -0.5, -0.8), Vec(9.8, 99.5, -0.8)));
+    segments.push_back(Segment(Vec(0.3, -0.5, -0.8), Vec(10.3, 99.5, -0.8)));
+    segments.push_back(Segment(Vec(0.6, -0.5, -0.8), Vec(10.6, 99.5, -0.8)));
     points.clear();
     planes.clear();
     show_infinite = INF_HORIZON;
 
+    camera()->setPosition(Vec(3.06833, 0.110576, 0.896283));
+    camera()->setUpVector(Vec(-0.321134, -0.0518585, 0.945613));
+    camera()->setViewDirection(Vec(-0.943686, -0.0663609, -0.324119));
+    updateGL();
+
     animation_counter = 0;
     connect(timer, SIGNAL(timeout()), this, SLOT(animation6()));
-    timer->start(50);
+    timer->start(1500);
     break;
   case 7:
     std::cout << "camera()->setPosition(Vec(" << camera()->position()[0] << ", "

@@ -51,7 +51,7 @@ protected:
   virtual void draw();
 
 private:
-  void drawPlane(const Plane &plane) const; // only handles xyz planes
+  void drawPlane(const Plane &plane) const;
   void drawGeneralPlane(const Plane &plane) const;
   void drawSegment(const Segment &segment) const;
   void drawCube(const Vec *vertices) const;
