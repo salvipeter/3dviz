@@ -7,4 +7,4 @@ QT *= opengl xml
 HEADERS = MyWindow.h MyViewer.h
 SOURCES = MyWindow.cpp MyViewer.cpp main.cpp
 
-LIBS *= -lqglviewer-qt4
+LIBS *= -lqglviewer-qt4 -lGLU

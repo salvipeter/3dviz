@@ -1,5 +1,7 @@
 #include "MyViewer.h"
 
+#include "GL/glu.h"
+
 using qglviewer::Vec;
 
 MyViewer::MyViewer(QWidget *parent) :
@@ -33,6 +35,7 @@ void MyViewer::init()
   glPolygonOffset(1, 1);
 
   glDisable(GL_LIGHTING);
+  glEnable(GL_LINE_SMOOTH);
 
   camera()->setPosition(Vec(0, -3.3, 0));
   camera()->setUpVector(Vec(0, 0, 1));
@@ -130,28 +133,30 @@ void MyViewer::drawCubeOutline(const Vec *a) const
   glEnd();
 }
 
+void MyViewer::drawSphere(const Vec &p, double r) const
+{
+  GLUquadricObj *quadric = gluNewQuadric();
+  gluQuadricNormals(quadric, GLU_SMOOTH);
+
+  glPushMatrix();
+  glTranslatef(p[0], p[1], p[2]);
+  glEnable(GL_LIGHTING);
+  gluSphere(quadric, r, 20, 20);
+  glDisable(GL_LIGHTING);
+  glPopMatrix();
+
+  gluDeleteQuadric(quadric);
+}
+
 void MyViewer::draw()
 {
   const Vec x(1, 0, 0), y(0, 1, 0), z(0, 0, 1);
 
-  // Draw the main planes
-  glColor4d(0.6, 0.4, 0.3, 1.0);
-  drawPlane(table);
-  glColor4d(0.0, 1.0, 0.0, 0.5);
-  drawPlane(canvas);
-
   // Draw the eye
-  glDisable(GL_DEPTH_TEST);
   glColor3d(0.0, 1.0, 1.0);
-  glBegin(GL_POINTS);
-  glVertex3fv(eye);
-  glEnd();
-  glEnable(GL_DEPTH_TEST);
+  drawSphere(eye, 0.025);
 
-  if (animation_type == 0) {
-    // Show only the planes and the eye position at startup
-    return;
-  } else if (animation_type == 1) {
+  if (animation_type == 1) {
     // The first animation involves a cube and thus needs special handling
     const double cube_size = 0.25;
     Vec a[8], b[8];
@@ -181,6 +186,14 @@ void MyViewer::draw()
     glColor3d(0.0, 0.0, 0.0);
     drawCubeOutline(a);
     drawCubeOutline(b);
+  }
+
+  if (animation_type < 2) {
+    // Draw the main planes
+    glColor4d(0.6, 0.4, 0.3, 1.0);
+    drawPlane(table);
+    glColor4d(0.0, 1.0, 0.0, 0.5);
+    drawPlane(canvas);
     return;
   }
 
@@ -227,6 +240,12 @@ void MyViewer::draw()
     glColor4d(1.0, 1.0, 0.0, 0.5);
     drawGeneralPlane(planes[i]);
   }
+
+  // Draw the main planes
+  glColor4d(0.6, 0.4, 0.3, 0.8);
+  drawPlane(table);
+  glColor4d(0.0, 1.0, 0.0, 0.5);
+  drawPlane(canvas);
 }
 
 Vec MyViewer::intersectLineWithPlane(const MyViewer::Line &line, const MyViewer::Plane &plane)
@@ -265,10 +284,12 @@ void MyViewer::animation2()
   switch(animation_counter) {
   case 1:
     segments[0].a = Vec(0.1, 0.3, -0.8);
+    timer->setInterval(80);
     break;
   case 100:
     show_infinite = INF_HORIZON;
     points.clear();
+    timer->setInterval(50);
     break;
   case 133:
     points.resize(1);
@@ -302,7 +323,7 @@ void MyViewer::animation2()
     const double x = (double)(animation_counter - 133) / 99.0;
     // Rays on the horizon
     Vec v(canvas.p[0] - plane_size + 2.0 * x * plane_size, canvas.p[1], eye[2]);
-    points[0] = eye + (v - eye) * 10.0;
+    points[0] = eye + (v - eye) * 100.0;
   } else if (266 <= animation_counter && animation_counter < 366) {
     const double x = (double)(animation_counter - 266) / 99.0;
     // Move point along -y
@@ -313,7 +334,7 @@ void MyViewer::animation2()
     const double x = (double)(animation_counter - 399) / 99.0;
     // Rays on the footline
     Vec v(table.p[0] - plane_size + 2.0 * x * plane_size, eye[1], table.p[2]);
-    points[0] = eye + (v - eye) * 10.0;
+    points[0] = eye + (v - eye) * 100.0;
   } else if (animation_counter == 499) {
     // Show all kinds of points
     points.push_back(Vec(0.1, 0.9, -0.8));
@@ -406,7 +427,7 @@ void MyViewer::animation5()
 
 void MyViewer::animation6()
 {
-  if (++animation_counter == 8) {
+  if (++animation_counter == 7) {
     timer->stop();
     timer->disconnect();
     return;
@@ -414,24 +435,21 @@ void MyViewer::animation6()
 
   switch(animation_counter) {
   case 1:
-    planes.push_back(Plane(segments[3], eye));
-    break;
-  case 2:
     planes[0] = Plane(segments[2], eye);
     break;
-  case 3:
+  case 2:
     planes[0] = Plane(segments[1], eye);
     break;
-  case 4:
+  case 3:
     planes[0] = Plane(segments[0], eye);
     break;
-  case 5:
+  case 4:
     planes.push_back(Plane(segments[1], eye));
     break;
-  case 6:
+  case 5:
     planes.push_back(Plane(segments[2], eye));
     break;
-  case 7:
+  case 6:
     planes.push_back(Plane(segments[3], eye));
     break;
   }
@@ -542,6 +560,7 @@ void MyViewer::animate(int type)
     segments.push_back(Segment(Vec(0.6, -0.5, -0.8), Vec(10.6, 99.5, -0.8)));
     points.clear();
     planes.clear();
+    planes.push_back(Plane(segments[3], eye));
     show_infinite = INF_HORIZON;
 
     camera()->setPosition(Vec(3.06833, 0.110576, 0.896283));

@@ -56,9 +56,10 @@ private:
   void drawSegment(const Segment &segment) const;
   void drawCube(const Vec *vertices) const;
   void drawCubeOutline(const Vec *vertices) const;
+  void drawSphere(const Vec &p, double r) const;
   static Vec intersectLineWithPlane(const Line &line, const Plane &plane);
 
-  static const double epsilon = 1.0e-7, plane_size = 1.0;
+  static const double epsilon = 1.0e-7, plane_size = 1.3;
   Vec eye;
   Plane canvas, table;
   std::vector<Segment> segments;
