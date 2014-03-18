@@ -593,7 +593,7 @@ void MyViewer::animate(int type)
     eye = Vec(0, -0.4, -0.2);   
     canvas.p = Vec(0, 0, -0.5);
     segments.resize(1);
-    points.resize(1);
+    points.clear();
     planes.clear();
     flashes.clear();
     show_infinite = INF_BOTH;
