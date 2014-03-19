@@ -311,7 +311,7 @@ void MyViewer::animation2()
   if (animation_counter < 166) {
     const double x = (double)animation_counter / 165.0;
     // Move point along y
-    points[0] = Vec(0.1, 0.3 + x * x * 100.0, -0.8);
+    points[0] = Vec(0.1, 0.3 + x * x * 20.0, -0.8);
     segments[0].b = points[0];
   } else if (200 <= animation_counter && animation_counter < 300) {
     const double x = (double)(animation_counter - 200) / 99.0;
@@ -592,7 +592,7 @@ void MyViewer::animate(int type)
   case 4:
     eye = Vec(0, -0.4, -0.2);   
     canvas.p = Vec(0, 0, -0.5);
-    segments.resize(1);
+    segments.clear();
     points.clear();
     planes.clear();
     flashes.clear();
