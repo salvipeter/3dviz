@@ -351,8 +351,8 @@ void MyViewer::animation3()
     const double x = (double)animation_counter / 165.0;
     // Move point along -y
     points[0] = Vec(0.1, x * (eye[1] + 100 * epsilon), -0.8);
-    points[0] = intersectLineWithPlane(Line(eye, points[0] - eye), canvas);
     segments[0].b = points[0];
+    points[0] = intersectLineWithPlane(Line(eye, points[0] - eye), canvas);
   } else if (200 <= animation_counter && animation_counter < 300) {
     const double x = (double)(animation_counter - 200) / 99.0;
     // Rays on the footline
