@@ -281,14 +281,14 @@ void MyViewer::animation1()
   const double x = (double)animation_counter / 99.0 * 2.0 * M_PI;
   points[0] = Vec(cos(x) * 0.5, 0.2 + sin(x) / 5, sin(x) * 0.5);
 
-  updateGL();
+  update();
 }
 
 void MyViewer::animation2()
 {
   if (++animation_counter == 300) {
     points.clear();
-    updateGL();
+    update();
     timer->stop();
     timer->disconnect();
     return;
@@ -320,14 +320,14 @@ void MyViewer::animation2()
     points[0] = eye + (v - eye) * 100.0;
   }
 
-  updateGL();
+  update();
 }
 
 void MyViewer::animation3()
 {
   if (++animation_counter == 300) {
     points.clear();
-    updateGL();
+    update();
     timer->stop();
     timer->disconnect();
     return;
@@ -360,7 +360,7 @@ void MyViewer::animation3()
     points[0] = eye + (v - eye) * 100.0;
   }
 
-  updateGL();
+  update();
 }
 
 void MyViewer::animation4()
@@ -376,7 +376,7 @@ void MyViewer::animation4()
   v = intersectLineWithPlane(Line(eye, v - eye), canvas);
   points.push_back(v);
 
-  updateGL();
+  update();
 
   timer->stop();
   timer->disconnect();
@@ -386,7 +386,7 @@ void MyViewer::animation5()
 {
   if (++animation_counter == 300) {
     points.clear();
-    updateGL();
+    update();
     timer->stop();
     timer->disconnect();
     return;
@@ -415,14 +415,14 @@ void MyViewer::animation5()
     // Wait
   }
 
-  updateGL();
+  update();
 }
 
 void MyViewer::animation6()
 {
   if (++animation_counter == 351) {
     points.clear();
-    updateGL();
+    update();
     timer->stop();
     timer->disconnect();
     return;
@@ -457,14 +457,14 @@ void MyViewer::animation6()
     }
   }
 
-  updateGL();
+  update();
 }
 
 void MyViewer::animation7()
 {
   if (++animation_counter == 200) {
     points.clear();
-    updateGL();
+    update();
     timer->stop();
     timer->disconnect();
     return;
@@ -476,14 +476,14 @@ void MyViewer::animation7()
     segments[i].b = points[i];
   }
 
-  updateGL();
+  update();
 }
 
 void MyViewer::animation8()
 {
   if (++animation_counter == 200) {
     points.clear();
-    updateGL();
+    update();
     timer->stop();
     timer->disconnect();
     return;
@@ -495,7 +495,7 @@ void MyViewer::animation8()
     segments[i].b = points[i];
   }
 
-  updateGL();
+  update();
 }
 
 void MyViewer::animation9()
@@ -527,7 +527,7 @@ void MyViewer::animation9()
     break;
   }
 
-  updateGL();
+  update();
 }
 
 void MyViewer::animate(int type)
@@ -704,7 +704,7 @@ void MyViewer::animate(int type)
     camera()->setPosition(Vec(3.06833, 0.110576, 0.896283));
     camera()->setUpVector(Vec(-0.321134, -0.0518585, 0.945613));
     camera()->setViewDirection(Vec(-0.943686, -0.0663609, -0.324119));
-    updateGL();
+    update();
 
     animation_counter = 0;
     connect(timer, SIGNAL(timeout()), this, SLOT(animation9()));

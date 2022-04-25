@@ -7,15 +7,15 @@
 
 MyWindow::MyWindow() : QWidget()
 {
-  setWindowTitle(tr("3D Vizualiz·ciÛ"));
+  setWindowTitle(tr("3D Vizualiz√°ci√≥"));
 
   viewer = new MyViewer(this);
   QVBoxLayout *vbox = new QVBoxLayout;
   QHBoxLayout *hbox1 = new QHBoxLayout, *hbox2 = new QHBoxLayout;
 
-  QString texts[] = { "", tr("Kocka"), tr("Pontok elˆl"), tr("Pontok h·tul"), tr("Pontok kÈpe"),
-                      tr("Egyenes"), tr("Sug·rsÌk"), tr("P·rhuzamosok I"),
-                      tr("P·rhuzamosok II"), tr("P·rhuzamosok sÌkjai"), tr("Kamera info") };
+  QString texts[] = { "", tr("Kocka"), tr("Pontok el√∂l"), tr("Pontok h√°tul"), tr("Pontok k√©pe"),
+                      tr("Egyenes"), tr("Sug√°rs√≠k"), tr("P√°rhuzamosok I"),
+                      tr("P√°rhuzamosok II"), tr("P√°rhuzamosok s√≠kjai"), tr("Kamera info") };
   QSignalMapper *mapper = new QSignalMapper(this);
   for (size_t i = 1; i < 10; ++i) {
     QPushButton *button = new QPushButton(texts[i]);

@@ -9,6 +9,6 @@ SOURCES = MyWindow.cpp MyViewer.cpp main.cpp
 
 win32: INCLUDE += -I"$$(QGLVIEWER_DIR)/";
 
-unix: LIBS *= -lqglviewer-qt4 -lGLU
+unix: LIBS *= -lQGLViewer-qt5 -lGLU
 # QGLVIEWER_DIR is an environment variable
 win32: LIBS *= -L"$$(QGLVIEWER_DIR)/QGLViewer/release/" -lQGLViewer2
