@@ -1,7 +1,4 @@
-#include <QHBoxLayout>
-#include <QPushButton>
-#include <QSignalMapper>
-#include <QVBoxLayout>
+#include <QtWidgets>
 
 #include "MyWindow.h"
 
@@ -26,7 +23,7 @@ MyWindow::MyWindow() : QWidget()
     else
       hbox2->addWidget(button);
   }
-  connect(mapper, SIGNAL(mapped(int)), viewer, SLOT(animate(int)));
+  connect(mapper, SIGNAL(mappedInt(int)), viewer, SLOT(animate(int)));
 
   vbox->addWidget(viewer);
   vbox->addLayout(hbox1);
